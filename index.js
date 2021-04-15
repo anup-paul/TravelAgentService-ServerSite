@@ -1,5 +1,6 @@
 const express = require('express');
 const MongoClient = require('mongodb').MongoClient;
+const ObjectId = require('mongodb').ObjectId;
 const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
@@ -21,8 +22,65 @@ app.get('/', (req, res) => {
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
-  const collection = client.db("travelAgency").collection("features");
+  const featuresCollection = client.db("travelAgency").collection("features");
+  const bookingCollection = client.db("travelAgency").collection("bookingDetails");
+  const reviewCollection = client.db("travelAgency").collection("reviewDetails");
   console.log("Connected successfully");
+
+
+  app.post('/addFeatures',(req,res)=>{
+      const newFeature = req.body;
+      console.log(newFeature);
+      featuresCollection.insertOne(newFeature)
+      .then(result=>{
+          res.send(result.insertedCount>0)
+      })
+
+  })
+
+
+  app.get('/features',(req, res)=>{
+      featuresCollection.find({})
+      .toArray((err, info)=>{
+          res.send(info)
+      })
+  })
+
+
+  app.get('/bookingFeatures/:id', (req, res) => {
+    featuresCollection.find({ _id:ObjectId(req.params.id) })
+      .toArray((err, item) => {
+        res.send(item);
+      })
+  })
+
+
+  app.post('/bookingData',(req, res)=>{
+      const newBooking = req.body;
+      bookingCollection.insertOne(newBooking)
+      .then(result=>{
+          res.send(result.insertedCount>0)
+      })
+  })
+
+  app.post('/addReviews',(req,res)=>{
+      const newReview = req.body;
+      console.log(newReview);
+      reviewCollection.insertOne(newReview)
+      .then(result=>{
+          res.send(result.insertedCount>0);
+      })
+  })
+
+
+  app.get('/reviews',(req, res)=>{
+    reviewCollection.find({})
+    .toArray((err, info)=>{
+        res.send(info)
+    })
+})
+
+
 });
 
 app.listen(process.env.PORT || port)
