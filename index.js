@@ -63,6 +63,15 @@ client.connect(err => {
       })
   })
 
+
+  app.get('/bookingList',(req,res)=>{
+      bookingCollection.find({})
+      .toArray((err,list)=>{
+          res.send(list)
+      })
+  })
+
+
   app.post('/addReviews',(req,res)=>{
       const newReview = req.body;
       console.log(newReview);
