@@ -25,6 +25,7 @@ client.connect(err => {
   const featuresCollection = client.db("travelAgency").collection("features");
   const bookingCollection = client.db("travelAgency").collection("bookingDetails");
   const reviewCollection = client.db("travelAgency").collection("reviewDetails");
+  const adminCollection = client.db("travelAgency").collection("AdminDetails");
   console.log("Connected successfully");
 
 
@@ -43,6 +44,14 @@ client.connect(err => {
       featuresCollection.find({})
       .toArray((err, info)=>{
           res.send(info)
+      })
+  })
+
+
+  app.delete('/delete/:id',(req, res)=>{
+      featuresCollection.deleteOne({_id:ObjectId(req.params.id)})
+      .then(result=>{
+          console.log(result)
       })
   })
 
@@ -86,6 +95,16 @@ client.connect(err => {
     reviewCollection.find({})
     .toArray((err, info)=>{
         res.send(info)
+    })
+})
+
+
+app.post('/admin',(req, res)=>{
+    const newAdmin = req.body;
+    console.log(newAdmin);
+    adminCollection.insertOne(newAdmin)
+    .then(result=>{
+        res.send(result.insertedCount>0)
     })
 })
 
