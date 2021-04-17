@@ -80,6 +80,13 @@ client.connect(err => {
             })
     })
 
+    app.get('/specificBookingList', (req, res)=>{
+        bookingCollection.find({email:req.query.email})
+        .toArray((err, documents)=>{
+            res.send(documents)
+        })
+    })
+
 
     app.post('/addReviews', (req, res) => {
         const newReview = req.body;
@@ -109,22 +116,32 @@ client.connect(err => {
     })
 
 
-    // app.post('/findAdmin', (req, res) => {
-    //     const email = req.body.email;
-    //     console.log(email);
+    app.post('/findAdmin', (req, res) => {
+        let email = req.body.email;
 
-    //      adminCollection.find({ email: email })
-    //         .toArray((err, admins) => {
-    //             if (admins.length === 0) {
-    //                email = email
-    //             }
+         adminCollection.find({ email: email })
+            .toArray((err, admins) => {
+                
+                if (admins.length) {
+                   
+                    bookingCollection.find(email)
+                    .toArray((err, result)=>{
+                        res.send(result);
+                    })
 
-    //             bookingCollection.find(email)
-    //             .toArray((err, result)=>{
-    //                 res.send(result);
-    //             })
-    //         })
-    // })
+                }
+        
+            })
+    })
+
+
+    app.post('/isAdmin',(req,res) => {
+        const email = req.body.email;
+        adminCollection.find({email:email})
+        .toArray((err, documents)=>{
+            res.send(documents.length > 0)
+        })
+    })
 
 
 });
